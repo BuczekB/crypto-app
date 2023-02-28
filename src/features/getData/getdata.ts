@@ -2,8 +2,7 @@ import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit'
 import axios from 'axios'
 
 
-
-type Data = {
+export type Data = {
     id: string,
     symbol:string,
     name:string,
@@ -35,32 +34,35 @@ type Data = {
 type InitialState = {
     loading: boolean,
     data: Data[],
-    error: string,
-    
+    error: string,  
 }
+
+
 
 const initialState: InitialState = {
     loading: false,
     data: [],
     error: '',
-    
 }
 
 
 
+export const fetchData = createAsyncThunk('data/fetchData', (page:number) =>{
 
-export const fetchData = createAsyncThunk('data/fetchData', () =>{
     return axios
-    .get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=2&sparkline=false')
+    .get(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=${page}&sparkline=false`)
     .then((response) => response.data)
-   
-    
 })
+
+
+
 
 const getData = createSlice({
     name: 'data',
-    initialState,
-    reducers: {},
+    initialState: initialState,
+    reducers: {
+       
+    },
     extraReducers: (builder) =>{
         builder.addCase(fetchData.pending, (state) =>{
             state.loading = true
@@ -74,9 +76,10 @@ const getData = createSlice({
             state.loading = false
             state.data = []
             state.error= action.error.message || 'Error fetch data'
-        })
+        })   
     }
 })
 
 
 export default getData.reducer
+
